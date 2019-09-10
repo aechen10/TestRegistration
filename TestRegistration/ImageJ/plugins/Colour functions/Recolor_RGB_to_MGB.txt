@@ -1,0 +1,31 @@
+//Recolor.txt
+//macro to convert an rgb image to one in
+//which the red channel is replaced by magenta
+//to allow easier viewing of images with multiple fluorescence
+// by color blind viewers
+
+orig = getTitle();
+run("RGB Split");
+selectWindow(orig + " (blue)");
+run("Blue");
+run("RGB Color");
+run("Rename...", "title=blue");
+selectWindow(orig + " (green)");
+run("Green");
+run("RGB Color");
+run("Rename...", "title=green");
+selectWindow(orig + " (red)");
+run("Magenta");
+run("RGB Color");
+run("Rename...", "title=red");
+run("Image Calculator...", "image1=red operation=Add image2=blue create");
+run("Image Calculator...", "image1='Result of red' operation=Add image2=green");
+newtitle= "Recolor-" +orig
+run("Rename...", "title=" +newtitle)
+selectWindow("red")
+run("Close")
+selectWindow("blue")
+run("Close")
+selectWindow("green")
+run("Close")
+

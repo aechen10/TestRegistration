@@ -1,0 +1,1 @@
+run("Install...", "install="+getDirectory("plugins")+"Macros/StartupMacros.txt");

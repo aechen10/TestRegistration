@@ -1,0 +1,37 @@
+//run("Subtract Background...", "rolling=50 stack");
+title = getTitle()
+ a1 = newArray(4);
+
+currentRow = nResults
+
+//names=newArray("DxDm", "AxAm", "DxAm")
+
+
+names=newArray("AxAm", "DxAm", "DxDm")
+
+
+setResult("Label", nResults, title);
+
+ if (selectionType==-1)
+         exit("This macro requires an area selection");
+
+      for (i=1; i<=nSlices; i++) 
+	{
+          setSlice(i);
+          getStatistics(area, mean);
+	a1[i-1] = mean;	   
+	setResult(names[i-1], currentRow, a1[i-1] );
+
+          }
+
+if(a1[2]<a1[0])
+          {setResult("ADE", currentRow ,(a1[1])/a1[0] );}
+else{
+          setResult("DBT", currentRow ,(a1[1]/a1[2] ));
+	}
+
+ updateResults()
+   
+
+
+

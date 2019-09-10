@@ -1,0 +1,142 @@
+originalTitle=getTitle();
+origID=getImageID();
+
+
+//setBatchMode(true);
+steps = nSlices/2;
+width = getWidth();
+height = getHeight();
+
+newImage("red", "8-bit", width, height, steps);
+redID = getImageID();
+
+for (i=1; i<=(steps); i++)
+	{selectImage(origID);
+	setSlice((i*2)-1);
+	run("Copy");
+	selectImage(redID);
+	setSlice(i);
+	run("Paste");
+	}
+
+
+
+newImage("green", "8-bit", width, height, steps);
+greenID= getImageID();
+
+for (i=1; i<=(steps); i++)
+	{selectImage(origID);
+	setSlice((i*2));
+	run("Copy");
+	selectImage(greenID);
+	setSlice(i);
+	run("Paste");
+	}
+//setBatchMode(false);
+
+//get unique image ID #s
+//selectImage(nImages-1);
+//redID=getImageID();
+//selectImage(nImages);
+//greenID=getImageID();
+
+
+//subtract green from red to correct bleedthru
+imageCalculator("Subtract stack",redID,greenID);
+redProcessID=getImageID();
+rename("red proc");
+run("Duplicate...", "title=red-copy duplicate");
+steps=nSlices;
+
+//make mask cells using SNARF channle then fill in bead holes
+setThreshold(15, 255);
+//run("OtsuThresholding 8Bit");
+run("Convert to Mask", "  black");
+
+run("Fill Holes", "stack");
+maskID=getImageID();
+rename("mask");
+
+//subtract cell outlines from green bead image to get 'outside beads'
+imageCalculator("Subtract create stack", greenID,maskID);
+outsideID=getImageID();
+rename("outside");
+
+//make a projection of the 'outside bead' stack
+run("Z Project...", "start=1 stop="+steps+" projection=[Max Intensity]");
+maxProjID=getImageID();
+rename("max");
+
+
+//subtract outside bead image from green beads stack  = all beads
+imageCalculator("Subtract create stack", greenID,maxProjID);
+insideID=getImageID();
+rename("inside");
+
+
+//analyse
+//count all beads
+
+selectImage(greenID);
+run("Z Project...", "start=1 stop="+steps+" projection=[Max Intensity]");
+greenMax = getImageID();
+rename("greenMax");
+
+setThreshold(60, 255);
+//run("OtsuThresholding 8Bit");
+run("Find Maxima...", "noise=10 output=Count exclude above");
+run("Find Maxima...", "noise=10 output=[Single Points] exclude above");
+run("Dilate");
+allPointsID=getImageID();
+
+selectImage(greenMax);
+close();
+
+selectImage(outsideID);
+run("Z Project...", "start=1 stop="+steps+" projection=[Max Intensity]");
+outsideMax = getImageID();
+rename("outsideMax");
+setThreshold(60, 255);
+//run("OtsuThresholding 8Bit");
+
+run("Find Maxima...", "noise=10 output=Count exclude above");
+run("Find Maxima...", "noise=10 output=[Single Points] exclude above");
+outsidePointsID=getImageID();
+run("Dilate");
+
+selectImage(outsideMax);
+close();
+
+
+//merge images for colour overlay
+selectImage(redProcessID);
+redTitle=getTitle();
+selectImage(greenID);
+greenTitle=getTitle();
+selectImage(outsideID);
+blueTitle=getTitle();
+run("RGB Merge...", "red=["+redTitle+"] green=["+greenTitle+"] blue=["+blueTitle+"]");
+rename("RGB - "+ originalTitle);
+run("Z Project...", "start=1 stop="+steps+" projection=[Max Intensity]");
+rgbID=getImageID();
+
+imageCalculator("Add stack", rgbID,allPointsID);
+imageCalculator("Subtract stack", rgbID,outsidePointsID);
+
+rename("RGB proj - "+ originalTitle);
+
+//tidy up
+selectImage(maskID);
+close();
+selectImage(maxProjID);
+close();
+selectImage(insideID);
+close();
+selectImage(outsidePointsID);
+close();
+selectImage(allPointsID);
+close();
+
+
+
+

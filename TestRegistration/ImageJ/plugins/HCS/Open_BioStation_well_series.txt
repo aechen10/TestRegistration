@@ -1,0 +1,82 @@
+// "BatchProcessFolders"
+//
+// This macro batch processes all the files in a folder and any
+// subfolders in that folder. In this example, it runs the Subtract 
+// Background command of TIFF files. For other kinds of processing,
+// edit the processFile() function at the end of this macro.
+
+requires("1.33s"); 
+series=".";
+dir = getDirectory("Choose a Directory");
+
+title=replace(dir, "/"," ");
+
+list = getFileList(dir);
+for (i=0; i<list.length; i++) {
+        	if (indexOf(list[i], "ObservationImage")>0)
+		{
+           		dir= dir + list[i];
+		}
+	}
+
+   //setBatchMode(true);
+newImage(title, "8-bit Black", 1000, 1000, 1);
+stack=getImageID();
+   count = 0;
+   countFiles(dir);
+   n = 0;
+name= substring(dir, lastIndexOf(dir, "\\"), lengthOf(dir));
+write(name);
+
+   processFiles(dir);
+	run("Delete Slice");
+	run("Select None");
+
+   //print(count+" files processed");
+   
+   function countFiles(dir) {
+      list = getFileList(dir);
+      for (i=0; i<list.length; i++) {
+          if (endsWith(list[i], "/"))
+              countFiles(""+dir+list[i]);
+          else
+              count++;
+      }
+  }
+
+   function processFiles(dir) {
+      list = getFileList(dir);
+	
+
+	for (i=0; i<list.length; i++) {
+          if (endsWith(list[i], "/"))
+	{
+              processFiles(""+dir+list[i]);}
+          else {
+             showProgress(n++, count);
+             path = dir+list[i];
+	if (endsWith(path, ".png")&&(indexOf(list[i],"M")<0) )
+		 {
+		if(indexOf(list[i], series)>0)
+	           		 processFile(path);
+		}
+          }
+      }
+  }
+
+  function processFile(path) {
+	write(path);
+	
+	write("yes:"+path);
+	open(path);
+run("8-bit");
+	title=getTitle();
+	run("Copy");
+	close();
+	run("Paste");
+	run("Add Slice");
+	setMetadata(title);
+             
+  }
+
+

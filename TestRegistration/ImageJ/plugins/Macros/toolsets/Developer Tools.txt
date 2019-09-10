@@ -1,0 +1,28 @@
+// Developer toolset:
+// Some useful tools/links  by G Landini
+
+macro "Unused Tool-1 - " {}  // leave empty toolbar slot
+
+macro "Documentation... Action Tool - Ce7fo11eeC000O11eeT5d0a?" {
+        run("URL...", "url=http://rsbweb.nih.gov/ij/docs/");
+    }
+
+macro "Record Macro... Action Tool - Cf77o11eeC000O11eeT5d0aR" {
+        run("Record...");
+    }
+
+macro "Macro Functions... Action Tool - Cfe0o11eeC000O11eeT6d0aF" {
+        run("URL...", "url=http://rsbweb.nih.gov/ij/developer/macro/functions.html");
+    }
+
+macro "Compile & Run... Action Tool - C0fbo11eeC000O11eeT5d0aC" {
+        run("Compile and Run...") ;
+    }
+
+macro "ImageJ Source... Action Tool - C0afo11eeC000O11eeT6d0aS" {
+        run("URL...", "url=http://rsbweb.nih.gov/ij/source/");
+    }
+
+macro "News... Action Tool - Cfa2fo11eeC000O11eeT5d0aN" {
+        run("URL...", "url=http://rsbweb.nih.gov/ij/notes.html");
+    }

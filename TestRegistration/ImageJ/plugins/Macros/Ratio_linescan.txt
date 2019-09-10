@@ -1,0 +1,33 @@
+origStack = getImageID();
+origTitle = getTitle();
+setSlice(1);
+run("Duplicate...", "title=ch1");
+ch1ID=getImageID();
+
+selectImage(origStack)
+setSlice(2);
+run("Duplicate...", "title=ch2");
+ch2ID=getImageID();
+
+imageCalculator("Divide create 32-bit", ch1ID,ch2ID);
+ratioID=getImageID()
+rename(origTitle+" - ratio");
+
+//set the number of 'timepoints' you'd like to average
+
+ROIwidth = 1;
+
+for (i=getWidth(); i>=0; i--)
+	{
+	run("Specify...", "width="+ROIwidth+" height="+getHeight()+" x="+i+" y=0");
+	run("Measure");
+	}
+
+ 
+selectImage(ch1ID);
+close();
+
+selectImage(ch2ID);
+close();
+
+

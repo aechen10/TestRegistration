@@ -1,0 +1,78 @@
+    var lut = 0;
+    var lutdir = getDirectory("startup")+"lut"+File.separator;
+    var list = getFileList(lutdir);
+
+    macro "Grayscale LUT Action Tool - C111F123dC444F423dC888F723dCbbbFa23dCeeeFd23d" {
+        run("Grays");
+   }
+
+    macro "Grayscale LUT Tool Options" {
+
+        run("xxx");
+   }
+
+    macro "Fire LUT Action Tool - C108F123dCa0aF423dCf40F723dCfb0Fa23dCff9Fd23d" {
+        run("Fire");
+   }
+
+    macro "Red LUT Action Tool - C100F123dC400F423dC800F723dCb00Fa23dCe00Fd23d" {
+        run("Red");
+   }
+
+    macro "Green LUT Action Tool - C010F123dC040F423dC080F723dC0b0Fa23dC0e0Fd23d" {
+        run("Green");
+   }
+
+    macro "Blue LUT Action Tool - C001F123dC004F423dC008F723dC00bFa23dC00eFd23d" {
+        run("Blue");
+   }
+
+    macro "Prevous LUT Action Tool - C037T4d14<" {
+        cycleLUTs(-1);
+   }
+
+    macro "Next LUT Action Tool - C037T4d14>" {
+        cycleLUTs(1);
+   }
+
+    macro "Invert LUT Action Tool - C037R12ccL12cc" {
+        run("Invert LUT");
+   }
+
+  // Based on the LUTFileTool by Gabriel Landini
+  function cycleLUTs(inc) {
+       if (!File.exists(lutdir) || list.length<1)
+           exit("No LUTs in the '/ImageJ/luts' folder");
+       if (nImages==0) {
+          call("ij.gui.ImageWindow.centerNextImage");
+          newImage("LUT", "8-bit ramp", 256, 32, 1);
+       }
+       if (bitDepth==24)
+           exit("RGB images do not have LUTs");
+       if (isKeyDown("alt"))
+           lut = 0;
+       else
+          lut += inc;
+      if (lut <0) lut =list.length-1;
+      if (lut >list.length-1) lut =0;
+      if (bitDepth()!=24)
+          run("LUT... ", "open=["+lutdir+list[lut]+"]");
+      name = list[lut];
+      if (endsWith(name, ".lut"))
+          name = substring(name, 0, lengthOf(name)-4);
+      showStatus((lut+1) + ". " + name);
+}
+
+  macro "Generate Icon String" {
+      colors = 5;
+      getLut(reds, greens, blues);
+      str = "";
+      for (i=0; i<colors; i++) {
+          index = i*256/colors+ 128/colors;
+          r = reds[index];
+          g = greens[index];
+          b = blues[index];
+          str = str + "C"+toHex(r/16)+toHex(g/16)+toHex(b/16)+"F"+toHex(i*3+1)+"23d";
+      }
+      print(str);
+  }

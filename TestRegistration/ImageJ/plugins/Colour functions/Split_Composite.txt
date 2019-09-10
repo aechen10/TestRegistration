@@ -1,0 +1,16 @@
+setBatchMode(true);
+keep=true;
+compID=getImageID();
+slices=nSlices;
+if(isKeyDown("alt")) keep=false;
+LUT = newArray("Red", "Green", "Blue", "Grays");
+for (i=1; i<=slices; i++)
+	{
+	selectImage(compID);
+	setSlice(i);
+	run("Split Channels...");
+	run(LUT[i-1]);
+	}
+selectImage(compID);
+if(!keep) close();
+setBatchMode(false);
